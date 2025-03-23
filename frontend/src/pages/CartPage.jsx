@@ -46,7 +46,9 @@ export default function CartPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-6 font-prompt">
-      <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">ตะกร้าสินค้า</h2>
+      <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
+        ตะกร้าสินค้า
+      </h2>
 
       {loading ? (
         <p className="text-center">กำลังโหลด...</p>
