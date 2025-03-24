@@ -13,12 +13,23 @@ const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const menuItems = [
-    { path: "/dashboard", icon: <FaChartPie />, label: "Dashboard Overview" },
-    { path: "/dashboard/members", icon: <FaUsers />, label: "จัดการสมาชิก" },
-    { path: "/dashboard/products", icon: <FaBoxOpen />, label: "จัดการสินค้า" },
-    { path: "/dashboard/orders", icon: <FaClipboardList />, label: "ประวัติการสั่งซื้อ" },
+  const role = localStorage.getItem("role");
+
+  // Admin menu items
+  const adminMenuItems = [
+    { path: "/admin/dashboard", icon: <FaChartPie />, label: "Dashboard Overview" },
+    { path: "/admin/members", icon: <FaUsers />, label: "จัดการสมาชิก" },
+    { path: "/admin/products", icon: <FaBoxOpen />, label: "จัดการสินค้า" },
+    { path: "/admin/orders", icon: <FaClipboardList />, label: "ประวัติการสั่งซื้อ" },
   ];
+
+  // User menu items
+  const userMenuItems = [
+    { path: "/dashboard", icon: <FaChartPie />, label: "Dashboard" },
+    { path: "/orders", icon: <FaClipboardList />, label: "Orders" },
+  ];
+
+  const menuItems = role === "admin" ? adminMenuItems : userMenuItems;
 
   return (
     <div
@@ -26,14 +37,13 @@ const Sidebar = () => {
         isOpen ? "w-72" : "w-16"
       }`}
     >
-      {/* Header */}
       <div className="p-4 flex items-center justify-between border-b border-gray-200">
         <h2
           className={`text-xl font-bold text-blue-700 transition-all duration-300 ${
             isOpen ? "block" : "hidden"
           }`}
         >
-          DASHBOARD
+          {role === "admin" ? "Admin Dashboard" : "User Dashboard"}
         </h2>
         <FaBars
           className="text-gray-600 cursor-pointer hover:scale-110 transition-transform"
@@ -41,7 +51,6 @@ const Sidebar = () => {
         />
       </div>
 
-      {/* Search Bar */}
       {isOpen && (
         <div className="relative p-4">
           <FaSearch className="absolute left-6 top-4 text-gray-400" />
