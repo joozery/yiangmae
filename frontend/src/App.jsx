@@ -9,6 +9,7 @@ import CartPage from './pages/CartPage';
 import PaymentPage from "./pages/PaymentPage";
 import OrderReceiptPage from "./pages/OrderReceiptPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage"; 
+import Drinks from "./pages/Drinks"; // ✅ เพิ่ม
 
 // 📌 Import หน้าภายใน Dashboard
 import DashboardOverview from "./components/Dashboard/page/DashboardOverview";
@@ -79,6 +80,7 @@ function App() {
         <Route path="/payment" element={<Layout><PaymentPage /></Layout>} />
         <Route path="/payment-success" element={<Layout><PaymentSuccessPage /></Layout>} /> 
         <Route path="/receipt" element={<Layout><OrderReceiptPage /></Layout>} />
+        <Route path="/drinks" element={<Layout><Drinks /></Layout>} /> {/* ✅ เพิ่มตรงนี้ */}
       </Routes>
     </Router>
   );

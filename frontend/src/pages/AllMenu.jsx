@@ -62,9 +62,10 @@ export default function AllMenu() {
         {items.map(product => (
           <div key={product.id} className="bg-white shadow-md rounded-lg p-4 text-center hover:shadow-xl transition">
             <img
-              src={product.image_url}
-              alt={product.name}
-              className="w-full h-48 object-cover rounded-md mb-4"
+  src={item.image_url}
+  alt={item.name}
+  className="w-full h-48 object-cover rounded-md mb-4"
+/>lassName="w-full h-48 object-cover rounded-md mb-4"
             />
             <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
             <p className="text-gray-500">{product.category}</p>
