@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ เพิ่ม useNavigate
 import axios from "axios";
 
 export default function CartPage() {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const userToken = localStorage.getItem("token");
+  const navigate = useNavigate(); // ✅ เรียกใช้ hook
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -92,9 +94,12 @@ export default function CartPage() {
 
       {cartItems.length > 0 && (
         <div className="mt-8 text-right">
-          <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md shadow">
-            ดำเนินการชำระเงิน
-          </button>
+          <button
+  onClick={() => navigate("/payment", { state: { cartItems } })}
+  className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md shadow"
+>
+  ดำเนินการชำระเงิน
+</button>
         </div>
       )}
     </div>

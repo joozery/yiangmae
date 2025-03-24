@@ -5,6 +5,9 @@ import Dashbord from "./components/Dashboard/Dashbord";
 import Home from "./pages/Home";
 import AllMenu from './pages/AllMenu';
 import CartPage from './pages/CartPage';
+import PaymentPage from "./pages/PaymentPage";
+import OrderReceiptPage from "./pages/OrderReceiptPage";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage"; // ✅ เพิ่มตรงนี้
 
 // 📌 Import หน้าภายใน Dashboard
 import DashboardOverview from "./components/Dashboard/page/DashboardOverview";
@@ -42,6 +45,9 @@ function App() {
         <Route path="/" element={<Layout><Home /></Layout>} />
         <Route path="/menu" element={<Layout><AllMenu /></Layout>} />
         <Route path="/cart" element={<Layout><CartPage /></Layout>} />
+        <Route path="/payment" element={<Layout><PaymentPage /></Layout>} />
+        <Route path="/payment-success" element={<Layout><PaymentSuccessPage /></Layout>} /> {/* ✅ */}
+        <Route path="/receipt" element={<Layout><OrderReceiptPage /></Layout>} />
     {/* หน้าอื่นๆ */}
       </Routes>
     </Router>
