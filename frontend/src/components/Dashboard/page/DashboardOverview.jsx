@@ -1,78 +1,158 @@
-import React from "react";
-import { FaBox, FaUsers, FaCreditCard, FaChartLine } from "react-icons/fa";
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import {
+  FaBoxOpen,
+  FaUsers,
+  FaReceipt,
+  FaSearch,
+} from "react-icons/fa";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
-const stats = [
-  { title: "Total Products", value: 5672, percentage: "+72%", color: "text-blue-600", bg: "bg-blue-100" },
-  { title: "Total Customers", value: 3045, percentage: "-40%", color: "text-yellow-600", bg: "bg-yellow-100" },
-  { title: "Pending Payments", value: 1055, percentage: "+46%", color: "text-red-600", bg: "bg-red-100" },
-];
-
-const barData = [
-  { name: "Mon", applications: 90, shortlisted: 70, registered: 80 },
-  { name: "Tue", applications: 85, shortlisted: 65, registered: 75 },
-  { name: "Wed", applications: 95, shortlisted: 80, registered: 90 },
-  { name: "Thu", applications: 88, shortlisted: 75, registered: 85 },
-  { name: "Fri", applications: 80, shortlisted: 60, registered: 70 },
-  { name: "Sat", applications: 92, shortlisted: 85, registered: 90 },
-  { name: "Sun", applications: 98, shortlisted: 90, registered: 95 },
-];
-
-const genderData = [
-  { name: "Male", value: 60 },
-  { name: "Female", value: 40 },
-];
 const COLORS = ["#8884d8", "#ff6b6b"];
 
 const DashboardOverview = () => {
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [totalOrders, setTotalOrders] = useState(0);
+
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const productRes = await axios.get(
+          "https://servercoffee-d58c85f2052e.herokuapp.com/products"
+        );
+        setTotalProducts(productRes.data.length);
+
+        const userRes = await axios.get(
+          "https://servercoffee-d58c85f2052e.herokuapp.com/user",
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setTotalUsers(userRes.data.length);
+
+        const ordersRes = await axios.get(
+          "https://servercoffee-d58c85f2052e.herokuapp.com/orders",
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setTotalOrders(ordersRes.data.length);
+        const total = ordersRes.data.reduce((acc, order) => acc + order.total_price, 0);
+        setTotalRevenue(total);
+      } catch (err) {
+        console.error("❌ โหลดข้อมูลสถิติล้มเหลว:", err);
+      }
+    };
+
+    if (token) fetchStats();
+  }, [token]);
+
+  const stats = [
+    {
+      icon: <FaBoxOpen className="text-2xl text-blue-600" />,
+      title: "สินค้าทั้งหมด",
+      value: totalProducts,
+      bg: "bg-blue-100",
+    },
+    {
+      icon: <FaUsers className="text-2xl text-green-600" />,
+      title: "ผู้ใช้ทั้งหมด",
+      value: totalUsers,
+      bg: "bg-green-100",
+    },
+    {
+      icon: <FaReceipt className="text-2xl text-purple-600" />,
+      title: "จำนวนออเดอร์",
+      value: totalOrders,
+      bg: "bg-purple-100",
+    },
+    {
+      icon: <FaReceipt className="text-2xl text-red-600" />,
+      title: "ยอดขายรวม",
+      value: `${totalRevenue.toFixed(2)} บาท`,
+      bg: "bg-red-100",
+    },
+  ];
+
+  const barData = [
+    { name: "Mon", revenue: 200 },
+    { name: "Tue", revenue: 450 },
+    { name: "Wed", revenue: 300 },
+    { name: "Thu", revenue: 600 },
+    { name: "Fri", revenue: 500 },
+    { name: "Sat", revenue: 700 },
+    { name: "Sun", revenue: 650 },
+  ];
+
+  const genderData = [
+    { name: "ชาย", value: 60 },
+    { name: "หญิง", value: 40 },
+  ];
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen font-[Prompt]">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-800">📊 Dashboard Overview</h1>
-        <input
-          type="text"
-          placeholder="🔍 Search"
-          className="p-2 bg-white border rounded-lg shadow-sm focus:outline-none"
-        />
+        <h1 className="text-2xl font-bold text-gray-800">📊 ภาพรวมระบบ</h1>
+        <div className="relative">
+          <FaSearch className="absolute left-3 top-2.5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="ค้นหา..."
+            className="pl-10 pr-4 py-2 border rounded-md shadow-sm bg-white"
+          />
+        </div>
       </div>
 
-      {/* Stats Section */}
-      <div className="grid grid-cols-3 gap-4 mt-6">
-        {stats.map((stat, index) => (
-          <div key={index} className={`p-4 rounded-lg shadow-md ${stat.bg}`}>
-            <h2 className="text-gray-700 text-lg font-semibold">{stat.title}</h2>
-            <div className="flex justify-between items-center">
-              <p className="text-2xl font-bold">{stat.value}</p>
-              <span className={`text-sm ${stat.color}`}>{stat.percentage}</span>
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+        {stats.map((item, index) => (
+          <div key={index} className={`p-4 rounded-lg shadow ${item.bg} flex items-center justify-between`}>
+            <div>
+              <h3 className="text-sm font-medium text-gray-600">{item.title}</h3>
+              <p className="text-xl font-bold text-gray-800">{item.value}</p>
             </div>
+            <div>{item.icon}</div>
           </div>
         ))}
       </div>
 
-      {/* Graphs Section */}
-      <div className="grid grid-cols-3 gap-6 mt-6">
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         {/* Bar Chart */}
-        <div className="bg-white p-4 rounded-lg shadow-md col-span-2">
-          <h2 className="text-lg font-bold text-gray-700 mb-3">📊 Weekly Applications</h2>
-          <ResponsiveContainer width="100%" height={200}>
+        <div className="col-span-2 bg-white p-4 rounded-lg shadow">
+          <h2 className="text-lg font-bold text-gray-700 mb-3">📈 รายรับต่อวัน</h2>
+          <ResponsiveContainer width="100%" height={250}>
             <BarChart data={barData}>
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="applications" fill="#8884d8" />
-              <Bar dataKey="shortlisted" fill="#ff6b6b" />
-              <Bar dataKey="registered" fill="#82ca9d" />
+              <Bar dataKey="revenue" fill="#8884d8" radius={[5, 5, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Pie Chart (Gender Distribution) */}
-        <div className="bg-white p-4 rounded-lg shadow-md">
-          <h2 className="text-lg font-bold text-gray-700 mb-3">📊 Candidates by Gender</h2>
-          <ResponsiveContainer width="100%" height={200}>
+        {/* Pie Chart */}
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h2 className="text-lg font-bold text-gray-700 mb-3">👥 เพศของผู้ใช้</h2>
+          <ResponsiveContainer width="100%" height={250}>
             <PieChart>
-              <Pie data={genderData} dataKey="value" outerRadius={80} fill="#8884d8">
+              <Pie
+                data={genderData}
+                dataKey="value"
+                outerRadius={80}
+                label
+              >
                 {genderData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index]} />
                 ))}
