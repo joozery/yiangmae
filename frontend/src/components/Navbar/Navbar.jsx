@@ -52,6 +52,9 @@ export default function Navbar() {
           <li className="hover:text-black cursor-pointer">
             <a href="/drinks">เครื่องดื่ม</a>
           </li>
+          <li className="hover:text-black cursor-pointer">
+    <a href="/bakery">เบเกอรี่</a> {/* ✅ เพิ่มตรงนี้ */}
+  </li>
 
           {/* ตะกร้าสินค้า */}
           <li className="relative cursor-pointer hover:text-black">
