@@ -37,9 +37,7 @@ export default function RecommendedMenuSection() {
               />
               <h3 className="text-xl font-bold text-gray-800 mb-2">{menu.name}</h3>
               <p className="text-gray-600 text-sm mb-4">{menu.category}</p>
-              <button className="bg-gray-800 text-white px-6 py-2 rounded hover:bg-gray-700 transition-all duration-200">
-                สั่งเลย
-              </button>
+              
             </div>
           ))}
         </div>
