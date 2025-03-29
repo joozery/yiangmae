@@ -21,6 +21,7 @@ const Sidebar = () => {
     { path: "/admin/members", icon: <FaUsers />, label: "จัดการสมาชิก" },
     { path: "/admin/products", icon: <FaBoxOpen />, label: "จัดการสินค้า" },
     { path: "/admin/orders", icon: <FaClipboardList />, label: "ประวัติการสั่งซื้อ" },
+    { path: "/admin/order-report", icon: <FaClipboardList />, label: "รายงานคำสั่งซื้อ" },
   ];
 
   // User menu items

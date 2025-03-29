@@ -11,7 +11,7 @@ export default function HeroSection() {
         />
         <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-center items-center text-center px-4">
           <h1 className="text-white text-4xl md:text-5xl font-extrabold mb-4">
-            ยินดีต้อนรับสู่ เตียงแม่ Coffee ☕
+            ยินดีต้อนรับสู่ เถียงแม่ Coffee ☕
           </h1>
           <p className="text-white text-lg md:text-xl mb-6">
             สัมผัสรสชาติกาแฟแท้และขนมอร่อยๆ จากร้านของเรา

@@ -17,7 +17,10 @@ import Bakery from "./pages/Bakery";
 import DashboardOverview from "./components/Dashboard/page/DashboardOverview";
 import Members from "./components/Dashboard/page/Members";
 import Products from "./components/Dashboard/page/Products";
+// 📌 เพิ่มตรงนี้ก่อน
+import OrderReportPage from "./components/Dashboard/page/OrderReportPage"; // ✅ import หน้าใหม่
 import Orders from "./components/Dashboard/page/Orders";
+
 import AdminLoginPage from "./components/Dashboard/AdminLoginPage";
 
 // 📌 Layout สำหรับหน้าเว็บหลัก
@@ -69,6 +72,7 @@ function App() {
   <Route path="members" element={<Members />} />
   <Route path="products" element={<Products />} />
   <Route path="orders" element={<Orders />} />
+  <Route path="order-report" element={<OrderReportPage />} /> {/* ✅ เพิ่มตรงนี้ */}
 </Route>
 
 
