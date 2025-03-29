@@ -7,7 +7,7 @@ export default function Footer() {
           
           {/* ร้าน */}
           <div>
-            <h3 className="text-lg font-semibold mb-2">เตียงแม่ Coffee ☕</h3>
+            <h3 className="text-lg font-semibold mb-2">เถียงแม่ Coffee ☕</h3>
             <p className="text-sm">
               ร้านกาแฟเล็กๆ ที่ใส่ใจทุกรายละเอียดของกาแฟ
               และขนมอบสดใหม่ทุกวัน

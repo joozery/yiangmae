@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { FaReceipt, FaUser, FaMoneyBillWave, FaCheckCircle } from "react-icons/fa";
+import {
+  FaReceipt,
+  FaUser,
+  FaMoneyBillWave,
+  FaCheckCircle,
+  FaClock,
+} from "react-icons/fa";
 import { ThreeDots } from "@agney/react-loading";
 
 export default function Orders() {
@@ -12,12 +18,15 @@ export default function Orders() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get("https://servercoffee-d58c85f2052e.herokuapp.com/orders", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await axios.get(
+          "https://servercoffee-d58c85f2052e.herokuapp.com/orders",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         setOrders(res.data);
       } catch (err) {
-        console.error("❌ โหลดประวัติออเดอร์ล้มเหลว:", err);
+        console.error("\u274C โหลดข้อมูลคำสั่งซื้อล้มเหลว:", err);
         setError("ไม่สามารถโหลดข้อมูลคำสั่งซื้อได้");
       } finally {
         setLoading(false);
@@ -35,7 +44,7 @@ export default function Orders() {
   return (
     <div className="p-6 font-prompt">
       <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-        <FaReceipt /> ประวัติคำสั่งซื้อ
+        <FaReceipt /> คำสั่งซื้อทั้งหมด
       </h2>
 
       {loading ? (
@@ -54,16 +63,19 @@ export default function Orders() {
                 <th className="p-4">ยอดรวม</th>
                 <th className="p-4">สถานะ</th>
                 <th className="p-4">วันที่</th>
+                <th className="p-4">วิธีชำระเงิน</th>
               </tr>
             </thead>
             <tbody>
               {orders.length > 0 ? (
                 orders.map((order) => (
                   <tr
-                    key={order.id}
+                    key={order.order_id}
                     className="border-t hover:bg-gray-50 transition duration-200"
                   >
-                    <td className="p-4 text-blue-800 font-semibold">#{order.id}</td>
+                    <td className="p-4 text-blue-800 font-semibold">
+                      #{order.order_id}
+                    </td>
                     <td className="p-4 flex items-center gap-2">
                       <FaUser /> {order.username || "ไม่ทราบชื่อ"}
                     </td>
@@ -71,16 +83,26 @@ export default function Orders() {
                       <FaMoneyBillWave className="inline-block mr-1" />
                       {order.total_price} บาท
                     </td>
-                    <td className="p-4 text-center text-green-700 font-medium">
-                      <FaCheckCircle className="inline-block mr-1" />
-                      สำเร็จ
+                    <td className="p-4 text-center font-medium">
+                      {order.status === "paid" ? (
+                        <span className="text-green-600">
+                          <FaCheckCircle className="inline-block mr-1" /> ชำระเงินแล้ว
+                        </span>
+                      ) : (
+                        <span className="text-yellow-600">
+                          <FaClock className="inline-block mr-1" /> รอชำระเงิน
+                        </span>
+                      )}
                     </td>
-                    <td className="p-4">{new Date(order.created_at).toLocaleString()}</td>
+                    <td className="p-4">
+                      {new Date(order.created_at).toLocaleString()}
+                    </td>
+                    <td className="p-4 text-gray-600">{order.payment_method}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="p-6 text-center text-gray-500">
+                  <td colSpan="6" className="p-6 text-center text-gray-500">
                     ไม่มีคำสั่งซื้อในระบบ
                   </td>
                 </tr>

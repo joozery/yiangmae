@@ -20,42 +20,51 @@ import {
 
 const COLORS = ["#8884d8", "#ff6b6b"];
 
-const DashboardOverview = () => {
+export default function DashboardOverview() {
   const [totalProducts, setTotalProducts] = useState(0);
   const [totalUsers, setTotalUsers] = useState(0);
-  const [totalRevenue, setTotalRevenue] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
+  const [totalRevenue, setTotalRevenue] = useState(0);
 
   const token = localStorage.getItem("token");
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const productRes = await axios.get(
-          "https://servercoffee-d58c85f2052e.herokuapp.com/products"
-        );
-        setTotalProducts(productRes.data.length);
+  const [topProducts, setTopProducts] = useState([]);
 
-        const userRes = await axios.get(
-          "https://servercoffee-d58c85f2052e.herokuapp.com/user",
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setTotalUsers(userRes.data.length);
+useEffect(() => {
+  const fetchStats = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-        const ordersRes = await axios.get(
-          "https://servercoffee-d58c85f2052e.herokuapp.com/orders",
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setTotalOrders(ordersRes.data.length);
-        const total = ordersRes.data.reduce((acc, order) => acc + order.total_price, 0);
-        setTotalRevenue(total);
-      } catch (err) {
-        console.error("❌ โหลดข้อมูลสถิติล้มเหลว:", err);
-      }
-    };
+      const productRes = await axios.get("https://servercoffee-d58c85f2052e.herokuapp.com/products");
+      setTotalProducts(productRes.data.length);
 
-    if (token) fetchStats();
-  }, [token]);
+      const userRes = await axios.get("https://servercoffee-d58c85f2052e.herokuapp.com/auth", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTotalUsers(userRes.data.length);
+
+      const ordersRes = await axios.get("https://servercoffee-d58c85f2052e.herokuapp.com/orders", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTotalOrders(ordersRes.data.length);
+
+      const salesRes = await axios.get("https://servercoffee-d58c85f2052e.herokuapp.com/orders/total-sales", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTotalRevenue(Number(salesRes.data.totalSales || 0));
+
+      // ✅ Fetch top 3 products
+      const topRes = await axios.get("https://servercoffee-d58c85f2052e.herokuapp.com/orders/top-products", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTopProducts(topRes.data);
+    } catch (err) {
+      console.error("❌ โหลดข้อมูลสถิติล้มเหลว:", err);
+    }
+  };
+
+  fetchStats();
+}, []);
 
   const stats = [
     {
@@ -117,7 +126,10 @@ const DashboardOverview = () => {
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
         {stats.map((item, index) => (
-          <div key={index} className={`p-4 rounded-lg shadow ${item.bg} flex items-center justify-between`}>
+          <div
+            key={index}
+            className={`p-4 rounded-lg shadow ${item.bg} flex items-center justify-between`}
+          >
             <div>
               <h3 className="text-sm font-medium text-gray-600">{item.title}</h3>
               <p className="text-xl font-bold text-gray-800">{item.value}</p>
@@ -159,11 +171,33 @@ const DashboardOverview = () => {
               </Pie>
               <Tooltip />
             </PieChart>
+
+            {/* Top Products */}
+<div className="mt-8 bg-white p-4 rounded-lg shadow">
+  <h2 className="text-lg font-bold text-gray-700 mb-4">🔥 สินค้าขายดี 3 อันดับ</h2>
+  {topProducts.length > 0 ? (
+    <ul className="space-y-2">
+      {topProducts.map((item, index) => (
+        <li
+          key={index}
+          className="flex justify-between items-center border-b pb-2"
+        >
+          <span className="font-medium text-gray-800">
+            {index + 1}. {item.product_name}
+          </span>
+          <span className="text-sm text-blue-600">
+            ขายไป {item.total_quantity} แก้ว
+          </span>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p className="text-gray-500">ยังไม่มีข้อมูลสินค้าขายดี</p>
+  )}
+</div>
           </ResponsiveContainer>
         </div>
       </div>
     </div>
   );
-};
-
-export default DashboardOverview;
+}

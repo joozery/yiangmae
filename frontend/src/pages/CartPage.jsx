@@ -1,20 +1,18 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ เพิ่ม useNavigate
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function CartPage() {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const userToken = localStorage.getItem("token");
-  const navigate = useNavigate(); // ✅ เรียกใช้ hook
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCart = async () => {
       try {
         const res = await axios.get("https://servercoffee-d58c85f2052e.herokuapp.com/cart", {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
+          headers: { Authorization: `Bearer ${userToken}` },
         });
         setCartItems(res.data);
       } catch (err) {
@@ -30,13 +28,31 @@ export default function CartPage() {
   const handleRemove = async (cartId) => {
     try {
       await axios.delete(`https://servercoffee-d58c85f2052e.herokuapp.com/cart/${cartId}`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
+        headers: { Authorization: `Bearer ${userToken}` },
       });
       setCartItems((prev) => prev.filter((item) => item.id !== cartId));
     } catch (err) {
       console.error("ลบสินค้าไม่สำเร็จ", err);
+    }
+  };
+
+  const handleQuantityChange = async (cartId, newQuantity) => {
+    if (newQuantity < 1) return; // ห้ามลดน้อยกว่า 1
+
+    try {
+      await axios.put(
+        `https://servercoffee-d58c85f2052e.herokuapp.com/cart/${cartId}`,
+        { quantity: newQuantity },
+        { headers: { Authorization: `Bearer ${userToken}` } }
+      );
+
+      setCartItems((prev) =>
+        prev.map((item) =>
+          item.id === cartId ? { ...item, quantity: newQuantity } : item
+        )
+      );
+    } catch (err) {
+      console.error("อัปเดตจำนวนไม่สำเร็จ", err);
     }
   };
 
@@ -46,11 +62,11 @@ export default function CartPage() {
     return acc;
   }, {});
 
+  const totalAmount = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
   return (
     <div className="max-w-4xl mx-auto p-6 font-prompt">
-      <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
-        ตะกร้าสินค้า
-      </h2>
+      <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">🛒 ตะกร้าสินค้า</h2>
 
       {loading ? (
         <p className="text-center">กำลังโหลด...</p>
@@ -75,7 +91,27 @@ export default function CartPage() {
                       />
                       <div>
                         <p className="font-semibold text-gray-800">{item.name}</p>
-                        <p className="text-sm text-gray-500">{item.price} บาท</p>
+                        <p className="text-sm text-gray-500">ราคา: {item.price} บาท</p>
+
+                        <div className="flex items-center gap-2 mt-2">
+                          <button
+                            onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                            className="bg-gray-200 hover:bg-gray-300 px-2 rounded"
+                          >
+                            -
+                          </button>
+                          <span className="text-sm font-medium">{item.quantity}</span>
+                          <button
+                            onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                            className="bg-gray-200 hover:bg-gray-300 px-2 rounded"
+                          >
+                            +
+                          </button>
+                        </div>
+
+                        <p className="text-sm font-semibold text-blue-700 mt-1">
+                          ราคารวม: {item.price * item.quantity} บาท
+                        </p>
                       </div>
                     </div>
                     <button
@@ -93,13 +129,16 @@ export default function CartPage() {
       )}
 
       {cartItems.length > 0 && (
-        <div className="mt-8 text-right">
+        <div className="mt-8 text-right space-y-4">
+          <p className="text-xl font-bold text-gray-800">
+            💰 ยอดรวมทั้งหมด: <span className="text-green-600">{totalAmount.toFixed(2)} บาท</span>
+          </p>
           <button
-  onClick={() => navigate("/payment", { state: { cartItems } })}
-  className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md shadow"
->
-  ดำเนินการชำระเงิน
-</button>
+            onClick={() => navigate("/payment", { state: { cartItems } })}
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md shadow"
+          >
+            ดำเนินการชำระเงิน
+          </button>
         </div>
       )}
     </div>

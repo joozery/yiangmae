@@ -10,7 +10,6 @@ export default function PaymentPage() {
 
   const cartItems = location.state?.cartItems || [];
 
-  // คำนวณราคารวม
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * (item.quantity || 1),
     0
@@ -52,7 +51,6 @@ export default function PaymentPage() {
     <div className="max-w-xl mx-auto p-6 font-prompt">
       <h2 className="text-2xl font-bold text-gray-800 mb-4">ชำระเงิน</h2>
 
-      {/* แสดงรายการสินค้า */}
       <div className="mb-6 space-y-2 text-sm text-gray-700">
         {cartItems.map((item, index) => (
           <div key={index} className="flex justify-between">
@@ -78,7 +76,6 @@ export default function PaymentPage() {
         </div>
       </div>
 
-      {/* เลือกช่องทางชำระเงิน */}
       <div className="space-y-4 mb-6">
         <label className="block text-lg font-medium">เลือกวิธีชำระเงิน:</label>
         <div className="space-y-2">

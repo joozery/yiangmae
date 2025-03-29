@@ -1,3 +1,5 @@
+// ✅ แก้ไขหน้า Products.jsx ให้จัดการสถานะแทนการลบ
+
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useLoading, BallTriangle } from "@agney/react-loading";
@@ -18,7 +20,6 @@ export default function Products() {
 
   const API_URL = "https://servercoffee-d58c85f2052e.herokuapp.com/products";
 
-  // 🎯 Loading animation setup
   const { containerProps, indicatorEl } = useLoading({
     loading,
     indicator: <BallTriangle width="50" />,
@@ -51,7 +52,6 @@ export default function Products() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const formData = new FormData();
       formData.append("name", newProduct.name);
@@ -90,16 +90,16 @@ export default function Products() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("คุณแน่ใจว่าต้องการลบสินค้านี้?")) {
-      try {
-        await axios.delete(`${API_URL}/${id}`);
-        fetchProducts();
-      } catch (err) {
-        console.error("ลบสินค้าล้มเหลว", err);
-      }
+  const handleStatusChange = async (id, status) => {
+    try {
+      await axios.put(`${API_URL}/${id}/status`, { status });
+      fetchProducts();
+    } catch (err) {
+      console.error("เปลี่ยนสถานะล้มเหลว", err);
     }
   };
+
+  const statusOptions = ["เปิดขาย", "ปิดการขาย", "รอสินค้าเข้า", "สินค้าหมด"];
 
   return (
     <div className="p-6 font-prompt">
@@ -117,13 +117,9 @@ export default function Products() {
         </button>
       </div>
 
-      {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-x-auto">
         {loading ? (
-          <div
-            {...containerProps}
-            className="flex justify-center items-center p-8"
-          >
+          <div {...containerProps} className="flex justify-center items-center p-8">
             {indicatorEl}
           </div>
         ) : (
@@ -134,6 +130,7 @@ export default function Products() {
                 <th className="px-6 py-3">ชื่อสินค้า</th>
                 <th className="px-6 py-3">ราคา</th>
                 <th className="px-6 py-3">หมวดหมู่</th>
+                <th className="px-6 py-3">สถานะ</th>
                 <th className="px-6 py-3 text-center">จัดการ</th>
               </tr>
             </thead>
@@ -152,18 +149,23 @@ export default function Products() {
                   <td className="px-6 py-4">{product.name}</td>
                   <td className="px-6 py-4">{product.price} บาท</td>
                   <td className="px-6 py-4">{product.category}</td>
+                  <td className="px-6 py-4">
+                    <select
+                      value={product.status || "เปิดขาย"}
+                      onChange={(e) => handleStatusChange(product.id, e.target.value)}
+                      className="border rounded px-2 py-1 text-sm"
+                    >
+                      {statusOptions.map((status) => (
+                        <option key={status} value={status}>{status}</option>
+                      ))}
+                    </select>
+                  </td>
                   <td className="px-6 py-4 text-center">
                     <button
                       onClick={() => handleEdit(product)}
-                      className="text-blue-500 hover:underline mr-3"
+                      className="text-blue-500 hover:underline"
                     >
                       แก้ไข
-                    </button>
-                    <button
-                      onClick={() => handleDelete(product.id)}
-                      className="text-red-500 hover:underline"
-                    >
-                      ลบ
                     </button>
                   </td>
                 </tr>

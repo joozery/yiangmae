@@ -1,3 +1,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ✅ Custom print style */
+@media print {
+    @page {
+      size: 80mm 70mm;
+      margin: 0;
+    }
+  
+    body * {
+      visibility: hidden;
+    }
+  
+    .print-area,
+    .print-area * {
+      visibility: visible;
+    }
+  
+    .print-area {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+    }
+  }

@@ -31,23 +31,28 @@ export default function Members() {
     }
   }, [token]);
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("คุณแน่ใจว่าต้องการลบสมาชิกนี้?")) return;
-
+  const handleStatusChange = async (id, newStatus) => {
     try {
-      await axios.delete(`https://servercoffee-d58c85f2052e.herokuapp.com/users/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUsers((prev) => prev.filter((user) => user.id !== id));
+      await axios.put(
+        `https://servercoffee-d58c85f2052e.herokuapp.com/auth/${id}/status`,
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === id ? { ...user, status: newStatus } : user
+        )
+      );
     } catch (err) {
-      console.error("❌ ลบสมาชิกไม่สำเร็จ:", err);
+      console.error("❌ อัปเดตสถานะล้มเหลว", err);
     }
   };
 
   return (
     <div className="p-6 font-prompt">
       <h2 className="text-3xl font-semibold mb-6 text-gray-800 flex items-center gap-2">
-        👥 <span>จัดการสมาชิก</span>
+        👥 จัดการสมาชิก
       </h2>
 
       {loading ? (
@@ -59,32 +64,48 @@ export default function Members() {
       ) : (
         <div className="overflow-x-auto">
           <div className="bg-white shadow-md rounded-xl overflow-hidden">
-            <table className="w-full border-collapse text-sm">
+            <table className="w-full text-sm text-gray-700">
               <thead className="bg-blue-600 text-white text-sm uppercase">
                 <tr>
-                  <th className="px-6 py-4 text-left">👤 ชื่อ</th>
-                  <th className="px-6 py-4 text-left">📧 อีเมล</th>
-                  <th className="px-6 py-4 text-center">✅ สถานะ</th>
-                  <th className="px-6 py-4 text-center">⚙️ จัดการ</th>
+                  <th className="px-6 py-4 text-left">ชื่อผู้ใช้</th>
+                  <th className="px-6 py-4 text-left">อีเมล</th>
+                  <th className="px-6 py-4 text-center">สถานะ</th>
+                  <th className="px-6 py-4 text-center">เปลี่ยนสถานะ</th>
                 </tr>
               </thead>
               <tbody>
                 {users.length > 0 ? (
                   users.map((user) => (
-                    <tr
-                      key={user.id}
-                      className="border-t hover:bg-gray-50 transition duration-150"
-                    >
-                      <td className="px-6 py-3">{user.username}</td>
-                      <td className="px-6 py-3">{user.email}</td>
-                      <td className="px-6 py-3 text-center text-green-600 font-semibold">ใช้งาน</td>
-                      <td className="px-6 py-3 text-center">
-                        <button
-                          onClick={() => handleDelete(user.id)}
-                          className="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded-full text-xs font-medium transition"
+                    <tr key={user.id} className="border-t hover:bg-gray-50 transition">
+                      <td className="px-6 py-4">{user.username}</td>
+                      <td className="px-6 py-4">{user.email}</td>
+                      <td className="px-6 py-4 text-center">
+                        <span
+                          className={`font-semibold px-3 py-1 rounded-full text-xs ${
+                            user.status === "active"
+                              ? "bg-green-100 text-green-700"
+                              : user.status === "banned"
+                              ? "bg-red-100 text-red-700"
+                              : "bg-yellow-100 text-yellow-700"
+                          }`}
                         >
-                          ลบ
-                        </button>
+                          {user.status === "active"
+                            ? "เปิดใช้งาน"
+                            : user.status === "banned"
+                            ? "แบน"
+                            : "ปิดใช้งาน"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <select
+                          value={user.status || "active"}
+                          onChange={(e) => handleStatusChange(user.id, e.target.value)}
+                          className="px-3 py-1 border rounded-md text-sm bg-white"
+                        >
+                          <option value="active">เปิดใช้งาน</option>
+                          <option value="inactive">ปิดใช้งาน</option>
+                          <option value="banned">แบน</option>
+                        </select>
                       </td>
                     </tr>
                   ))
