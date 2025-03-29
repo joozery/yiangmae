@@ -5,7 +5,6 @@ import { ThreeDots } from "@agney/react-loading";
 export default function OrderReportPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [totalSales, setTotalSales] = useState(0);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -15,10 +14,6 @@ export default function OrderReportPage() {
           headers: { Authorization: `Bearer ${token}` },
         });
         setOrders(res.data);
-
-        // รวมยอดขายทั้งหมด
-        const total = res.data.reduce((sum, order) => sum + order.total_price, 0);
-        setTotalSales(total);
       } catch (err) {
         console.error("❌ ดึงข้อมูลออเดอร์ล้มเหลว:", err);
       } finally {
@@ -85,13 +80,6 @@ export default function OrderReportPage() {
                   </td>
                 </tr>
               ))}
-              {/* รวมยอดขายทั้งหมด */}
-              <tr className="bg-gray-100 font-bold">
-                <td colSpan="6" className="p-3 text-right border">💰 ยอดขายรวมทั้งหมด:</td>
-                <td className="p-3 text-right text-green-700 border">
-                  {totalSales.toLocaleString()} ฿
-                </td>
-              </tr>
             </tbody>
           </table>
         </div>
